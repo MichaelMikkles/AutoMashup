@@ -7,15 +7,20 @@ Automashup is a Python application that allows you to generate a mashup from sev
 
 We strongly recommand the use of a Python 3.10 environment with a Conda environment.
 
-> pip3.10 install -r requirements.txt
+> pip3 install -r requirements.txt
+
+NATTEN version 0.15.1 
+
+> pip install natten==0.15.1+torch200cu117 -f https://shi-labs.com/natten/wheels
 
 To install All-In-One Music Structure Analyzer: https://github.com/mir-aidj/all-in-one/tree/main (LINUX, MACOS RECOMMANDED!)
+
 
 ### Launch the app
 
 > cd ./automashup-app
 
-> streamlit run streamlit.py
+> streamlit run app.py
 
 ## Other
 
