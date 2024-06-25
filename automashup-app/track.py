@@ -99,46 +99,60 @@ class Track:
         # Function to align a track's phases (verse, chorus, bridge, ...)
         # to a target track.
         # we'll do loops on the track to reach the number of beats targetted
-        # for each phase
+        # for each phase
         # The challenge for this function is to keep the beats metadata
         # updated
         audio = np.array([])
-        
+
         # lists of the return track beats and downbeats
-        # we put 0 for convenience (see beats[-1] after)
+        # we put 0 for convenience (see beats[-1] after)
         beats = [0]
         downbeats = [0]
 
         # loop over each phase to reproduce
         for target_segment in target_track.segments:
             i = 0
-            segment = self.segments[i]
+            found_segment = False
 
-            # we look for a segment of our modified with the same phase
+            # we look for a segment of our modified with the same phase
             # as the one we try to reproduce
-            while i<len(self.segments)-1 and (segment.label!=target_segment.label or len(segment.beats)==0):
-                i+=1
+            while i < len(self.segments):
                 segment = self.segments[i]
+                if segment.label == target_segment.label and len(segment.beats) > 0:
+                    found_segment = True
+                    break
+                i += 1
 
             # if we do not find it, we add zeros with the right length
-            if not (segment.label==target_segment.label and len(segment.beats)>0):
-                audio = np.concatenate([audio, np.zeros(int(len(target_segment.beats) / (self.bpm/60) * self.sr))])
-                beats = beats + [beats[-1] + (i+1)/(self.bpm/60) for i in range(len(target_segment.beats))]
-                downbeats = downbeats + [downbeats[-1] + (4*i+1)/(self.bpm/60) for i in range(len(target_segment.beats)//4)]
-            else: 
-                # if we find it, we make it fitted to the desired beat number
-                segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats))
-                audio = np.concatenate([audio, segment_fitted.audio])
+            if not found_segment:
+                segment_length = int(len(target_segment.beats) / (self.bpm / 60) * self.sr)
+                audio = np.concatenate([audio, np.zeros(segment_length)])
+                beats += [beats[-1] + (i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats))]
+                downbeats += [downbeats[-1] + (4 * i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats) // 4)]
+            else:
+                print(f"Matching segment found: {segment.label} at {segment.start}")
+                # For some songs, dimensions of beats arrays won't match so 
+                # added try exception
+                try:
+                    # if we find it, we make it fitted to the desired beat number
+                    segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats))
+                    audio = np.concatenate([audio, segment_fitted.audio])
 
-                # we add the new beats to be able to sync after
-                beats = beats + [beats[-1] + phase_beat for phase_beat in segment_fitted.beats]
-                downbeats = downbeats + [downbeats[-1] + phase_downbeat for phase_downbeat in segment_fitted.downbeats]
+                    # we add the new beats to be able to sync after
+                    beats += [beats[-1] + phase_beat for phase_beat in segment_fitted.beats]
+                    downbeats += [downbeats[-1] + phase_downbeat for phase_downbeat in segment_fitted.downbeats]
+                except Exception as e:
+                    print(f"Error fitting segment: {segment.label} at {segment.start}, Error: {e}")
+                    continue
 
-        # we get rid of the first beats added for convenience
+        # we get rid of the first beats added for convenience
         beats = beats[1:]
         downbeats = downbeats[1:]
 
         self.audio = audio
         self.beats = beats
         self.downbeats = downbeats
-        
+
+
+
+

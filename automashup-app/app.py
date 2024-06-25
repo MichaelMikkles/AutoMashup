@@ -181,7 +181,7 @@ if tabs =='App':
 
         # We add an option to be able to select a mashup method
         merger.add_option("Method", 'select', value=next(iter(mashup_technics)), items=list(mashup_technics.keys()))
-
+    
         def merger_func(self):
             # spinner to view loading
             with st.spinner('Computing ' + self._name):
@@ -199,7 +199,6 @@ if tabs =='App':
                 else :
                     tracks = [track1, track2, track3, track4]
                     tracks = [track for track in tracks if track is not None]
-
                     # we apply the mashup technic
                     self.set_interface(name="Result", value=mashup_technics[self._options['Method']['value']](tracks))
 
@@ -214,14 +213,12 @@ if tabs =='App':
         player = Block(name='Player')
         player.add_input(name='Track')
         player.add_option("Metronome", "checkbox")
-
         def player_func(self):
             # view loading
             with st.spinner('Computing ' + self._name):
                 # again we do a copy, because the metronome will modify
                 # the audio
                 track = copy.deepcopy(self.get_interface(name='Track'))
-
                 if (track==None):
                     st.markdown("### "+self._name)
                     st.markdown("The player must have an input")

@@ -9,12 +9,11 @@ We strongly recommand the use of a Python 3.10 environment with a Conda environm
 
 > pip3 install -r requirements.txt
 
-NATTEN version 0.15.1 
+NATTEN version 0.15.1
 
 > pip install natten==0.15.1+torch200cu117 -f https://shi-labs.com/natten/wheels
 
 To install All-In-One Music Structure Analyzer: https://github.com/mir-aidj/all-in-one/tree/main (LINUX, MACOS RECOMMANDED!)
-
 
 ### Launch the app
 

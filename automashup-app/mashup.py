@@ -58,21 +58,22 @@ def mashup_technic_repitch(tracks):
 
 
 def mashup_technic_fit_phase(tracks):
-    # mashup technic with phase alignment (i.e. chorus with chorus, verse with verse...)
-    # each track's structure is aligned with the first one's
-    for i in range(len(tracks)-1):
-        tracks[i+1].fit_phase(tracks[0]) 
+    # Mashup technique with phase alignment (i.e., chorus with chorus, verse with verse...)
+    # Each track's structure is aligned with the first one
+    
+    for i in range(len(tracks) - 1):
+        tracks[i + 1].fit_phase(tracks[0])
 
-    # standard mashup method
+    # Standard mashup method
     return mashup_technic(tracks)
 
-
 def mashup_technic_fit_phase_repitch(tracks):
-    # mashup technic with phase alignment and repitch
-    # repitch
-    key = tracks[0].get_key()
-    for i in range(len(tracks)-1):
-        tracks[i+1].pitch_track(key)
+    # Mashup technique with phase alignment and repitch
+    # Repitch
+    
+    key = tracks[0].get_key()    
+    for i in range(len(tracks) - 1):
+        tracks[i + 1].pitch_track(key)
 
-    # phase fit mashup
+    # Phase fit mashup
     return mashup_technic_fit_phase(tracks)
