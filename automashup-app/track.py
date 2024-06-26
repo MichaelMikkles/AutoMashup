@@ -109,8 +109,12 @@ class Track:
         beats = [0]
         downbeats = [0]
 
+
+        print(f" ********************** Adjusting the song {self.name}  **********************")
+
         # loop over each phase to reproduce
         for target_segment in target_track.segments:
+            print(f"searching the fragment {target_segment.label}")
             i = 0
             found_segment = False
 
@@ -118,19 +122,20 @@ class Track:
             # as the one we try to reproduce
             while i < len(self.segments):
                 segment = self.segments[i]
-                if segment.label == target_segment.label and len(segment.beats) > 0:
+                if segment.label == target_segment.label:
                     found_segment = True
                     break
                 i += 1
 
             # if we do not find it, we add zeros with the right length
             if not found_segment:
+                print(f"Couldn't find segment: {target_segment.label} at {target_segment.start}")
                 segment_length = int(len(target_segment.beats) / (self.bpm / 60) * self.sr)
                 audio = np.concatenate([audio, np.zeros(segment_length)])
                 beats += [beats[-1] + (i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats))]
                 downbeats += [downbeats[-1] + (4 * i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats) // 4)]
             else:
-                print(f"Matching segment found: {segment.label} at {segment.start}")
+                print(f"Matching segment found: {segment.label} at {segment.start} with segment {target_segment.label} at {target_segment.start}")
                 # For some songs, dimensions of beats arrays won't match so 
                 # added try exception
                 try:

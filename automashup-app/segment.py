@@ -61,23 +61,16 @@ class Segment:
             else : 
                 self.right_transition = track.audio[round(self.end*self.sr):]
 
-    def concatenate(self, segment):
+    def concatenate(self):
         # Functions to concatenate two segments, and to keep track of beats and downbeats
 
         # Calculate the transition length (optional, if you need to handle transitions between segments)
         # transition_length = min(len(self.right_transition), len(segment.left_transition))
         
-
-        print(f"Concatenating segment: {self.label} with segment: {segment.label}")
         # Calculate the seconds to shift the incoming beats to start where the current segment's audio ends.
         offset = len(self.audio) / self.sr
-        new_beats = segment.beats + offset
-        new_downbeats = segment.downbeats + offset
-
-        print(f"Original audio length: {len(self.audio)}, segment audio length: {len(segment.audio)}")
-        print(f"Original beats: {self.beats}")
-        print(f"Segment beats: {segment.beats}")
-        print(f"New beats: {new_beats}")
+        new_beats = self.beats + offset
+        new_downbeats = self.downbeats + offset
 
         # Concatenate the beats array of the current segment
         self.beats = np.concatenate([self.beats, new_beats])
@@ -86,9 +79,8 @@ class Segment:
         self.downbeats = np.concatenate([self.downbeats, new_downbeats])
 
         # Concatenate the audio data of the two segments
-        self.audio = np.concatenate((self.audio, segment.audio))
+        self.audio = np.concatenate((self.audio, self.audio))
 
-        print(f"After concatenation, audio length: {len(self.audio)}, beats length: {len(self.beats)}, downbeats length: {len(self.downbeats)}")
 
 
 
@@ -114,7 +106,7 @@ class Segment:
             else:
                 # Ensure the segment's beats match or exceed the target beat_number
                 while len(result.beats) < beat_number:
-                    result.concatenate(self)
+                    result.concatenate()
 
                 # Adjust audio length to fit beat_number
                 new_length = round(len(result.audio) * (beat_number / len(result.beats)))
@@ -129,7 +121,3 @@ class Segment:
             print(f"Error fitting segment {self.label} to {beat_number} beats: {e}")
             # Return None or raise the exception based on your error handling strategy
             raise e  # or return None or handle the error appropriately
-
-
-
-
