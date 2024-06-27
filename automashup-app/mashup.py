@@ -13,7 +13,8 @@ def mashup_technic(tracks):
     # Mashup technic with first downbeat alignment and bpm sync
     sr = tracks[0].sr # The first track is used to determine the target bpm
     tempo = tracks[0].bpm
-    beginning_instant = tracks[0].downbeats[0] # downbeats metadata
+    main_track_length = len(tracks[0].audio)
+    beginning_instant = tracks[0].downbeat[0] # downbeats metadata
     beginning = beginning_instant * sr
     mashup = np.zeros(0)
     mashup_name = ""
@@ -22,7 +23,10 @@ def mashup_technic(tracks):
     for track in tracks:
         mashup_name += track.name + " " # name
         track_tempo = track.bpm
-        track_beginning_temporal = track.downbeats[0]
+        if track == tracks[0]:
+            track_beginning_temporal = track.beats[0]
+        else:
+            track_beginning_temporal = track.downbeats[0]
         track_sr = track.sr
         track_beginning = track_beginning_temporal * track_sr
         track_audio = track.audio
@@ -39,6 +43,12 @@ def mashup_technic(tracks):
         size = max(len(mashup), len(final_track_audio))
         mashup = np.array(mashup)
         mashup = (increase_array_size(final_track_audio, size) + increase_array_size(mashup, size))
+
+    # Adjust mashup length to be the same as the main track's audio length
+    if len(mashup) > main_track_length:
+        mashup = mashup[:main_track_length]
+    else:
+        mashup = increase_array_size(mashup, main_track_length)
 
     # we return a modified version of the first track
     # doing so, we keep its metadata

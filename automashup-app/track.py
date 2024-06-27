@@ -133,6 +133,8 @@ class Track:
                 segment_length = int(len(target_segment.beats) / (self.bpm / 60) * self.sr)
                 audio = np.concatenate([audio, np.zeros(segment_length)])
                 beats += [beats[-1] + (i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats))]
+
+                
                 downbeats += [downbeats[-1] + (4 * i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats) // 4)]
             else:
                 print(f"Matching segment found: {segment.label} at {segment.start} with segment {target_segment.label} at {target_segment.start}")

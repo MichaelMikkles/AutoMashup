@@ -69,13 +69,13 @@ class Segment:
         
         # Calculate the seconds to shift the incoming beats to start where the current segment's audio ends.
         offset = len(self.audio) / self.sr
-        new_beats = self.beats + offset
-        new_downbeats = self.downbeats + offset
 
         # Concatenate the beats array of the current segment
+        new_beats = self.beats + offset
         self.beats = np.concatenate([self.beats, new_beats])
 
         # Concatenate the downbeats array
+        new_downbeats = self.downbeats + offset
         self.downbeats = np.concatenate([self.downbeats, new_downbeats])
 
         # Concatenate the audio data of the two segments
@@ -85,15 +85,7 @@ class Segment:
 
 
     def get_audio_beat_fitted(self, beat_number):
-        """
-        Fit the segment to a specified number of beats.
-
-        Parameters:
-        - beat_number (int): Number of beats to fit the segment to.
-
-        Returns:
-        - fitted_segment (Segment): A copy of the segment fitted to the specified beat number.
-        """
+        #Fit the segment to a specified number of beats.
         try:
             # Make a deep copy of the segment to avoid modifying the original
             result = copy.deepcopy(self)
