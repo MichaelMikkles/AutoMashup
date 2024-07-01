@@ -3,7 +3,8 @@ import os
 import allin1
 import json
 import copy
-from barfi import st_barfi, Block
+import pickle
+from barfi import st_barfi, Block , barfi_schemas
 from st_on_hover_tabs import on_hover_tabs
 
 from track import Track
@@ -139,6 +140,23 @@ if tabs =='App':
         # It gives 5 outputs of type Track, corresponding to the separated
         # or entire versions of the selected song
 
+        try:
+            schemas = barfi_schemas()
+        except Exception as e:
+            st.error(f"Error loading schemas: {e}")
+            schemas = []
+
+        # Add "Start New" as the first option
+        schema_options = ['Start New'] + schemas
+
+        # Allow the user to select a schema
+        load_schema = st.selectbox('Select a saved schema:', schema_options)
+
+        # Check if the selected option is "Start New"
+        if load_schema == 'Start New':
+            load_schema = None  # Set to None to start with a blank schema
+
+
         feed = Block(name="Track")
 
         # Interfaces
@@ -202,8 +220,10 @@ if tabs =='App':
                     # we apply the mashup technic
                     self.set_interface(name="Result", value=mashup_technics[self._options['Method']['value']](tracks))
 
-        merger.add_compute(merger_func)
+        
 
+        merger.add_compute(merger_func)
+        
         ### Player
         # The player bloc is the bloc which creates a player to listen to 
         # tracks
@@ -234,8 +254,34 @@ if tabs =='App':
 
         player.add_compute(player_func)
 
+        # Delete function from barfi manage_schema.py allows deletion of current schema
+        def delete_schema(schema_name: str):
+            try:
+                with open('schemas.barfi', 'rb') as handle_read:
+                    schemas = pickle.load(handle_read)
+            except FileNotFoundError:
+                schemas = {}
+
+            if schema_name in schemas:
+                del schemas[schema_name]
+            else:
+                raise ValueError(
+                    f'Schema :{schema_name}: not found in the saved schemas')
+            
+            with open('schemas.barfi', 'wb') as handle_write:
+                pickle.dump(schemas, handle_write, protocol=pickle.HIGHEST_PROTOCOL)
+
+        if load_schema and load_schema != 'Start New':
+            if st.button(f"Delete schema '{load_schema}'"):
+                try:
+                    delete_schema(load_schema)
+                    st.success(f"Schema '{load_schema}' deleted successfully.")
+                    st.experimental_rerun()  # Refresh the app to update the list of schemas
+                except ValueError as e:
+                    st.error(f"Failed to delete schema: {e}")
+
         # Trigger Barfi, add all the blocks
-        barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True)
+        barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
 
 if tabs == 'The project':
     # Application title

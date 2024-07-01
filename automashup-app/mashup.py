@@ -14,7 +14,7 @@ def mashup_technic(tracks):
     sr = tracks[0].sr # The first track is used to determine the target bpm
     tempo = tracks[0].bpm
     main_track_length = len(tracks[0].audio)
-    beginning_instant = tracks[0].downbeat[0] # downbeats metadata
+    beginning_instant = tracks[0].downbeats[0] # downbeats metadata
     beginning = beginning_instant * sr
     mashup = np.zeros(0)
     mashup_name = ""
