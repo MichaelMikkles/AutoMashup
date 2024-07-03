@@ -160,6 +160,13 @@ class Track:
         self.beats = beats
         self.downbeats = downbeats
 
+    def get_segments(track_name):
+        # This method should return a list of segments for the given song
+        track = Track.track_from_song(track_name, 'entire')
+        return [segment.label for segment in track.segments]
+
+
+
 
 
 

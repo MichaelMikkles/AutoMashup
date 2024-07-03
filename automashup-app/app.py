@@ -117,6 +117,7 @@ if tabs =='App':
 
 
     track_list = []
+    segment_list = []
 
     if os.path.exists('./separated/htdemucs/'):
         for index, folder_name in enumerate(os.listdir('./separated/htdemucs/')):
@@ -178,11 +179,22 @@ if tabs =='App':
                 self.set_interface(name='Bass', value=Track.track_from_song(track_name, 'bass'))
                 self.set_interface(name='Drums', value=Track.track_from_song(track_name, 'drums'))
                 self.set_interface(name='Other', value=Track.track_from_song(track_name, 'other'))
-
+                
         feed.add_compute(feed_func)
 
         # option for choosing the song
         feed.add_option("Track", 'select', value=track_list[0], items=track_list)
+        track_name = feed.get_option("Track")
+
+        # Retrieve segments for the selected track
+        if track_name:
+            segments = Track.get_segments(track_name)
+            segment_labels = [label for label in segments]
+        else:
+            segment_labels = []
+
+        # Add the option to be able to select 1 segment of the song to include
+        feed.add_option("Segment", 'select', value=segment_labels[0] if segment_labels else '', items=segment_labels)
 
         ### Merger
         # The merger block is made to combine up to 4 tracks and to 
@@ -219,7 +231,6 @@ if tabs =='App':
                     tracks = [track for track in tracks if track is not None]
                     # we apply the mashup technic
                     self.set_interface(name="Result", value=mashup_technics[self._options['Method']['value']](tracks))
-
         
 
         merger.add_compute(merger_func)
@@ -282,6 +293,7 @@ if tabs =='App':
 
         # Trigger Barfi, add all the blocks
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
+        print(track_name)
 
 if tabs == 'The project':
     # Application title
