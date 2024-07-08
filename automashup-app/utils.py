@@ -4,6 +4,9 @@ import shutil
 import math
 import json
 from pymusickit.key_finder import KeyFinder
+from collections import OrderedDict
+from pydub import AudioSegment
+from pydub.playback import play
 
 ### Here are some useful functions used in other parts of the project
 
@@ -93,3 +96,27 @@ def closest_index(value, value_list):
     # get the index of the closest value of a specific target in a list
     closest_index = min(range(len(value_list)), key=lambda i: abs(value_list[i] - value))
     return closest_index
+
+def get_unique_ordered_list(input_list):
+    # Use OrderedDict to preserve order while removing duplicates
+    return list(OrderedDict.fromkeys(input_list))
+
+# extracts the start and end times for the selected segment
+def get_segment_times(segments, selected_label):
+    for segment in segments:
+        if segment['label'] == selected_label:
+            return segment['start'], segment['end']
+    return 0, 2  # Default to first 2 seconds if segment not found
+
+def extract_audio_segment(file_path, start_time, end_time, output_path):
+    try:
+        # Load the audio file
+        audio = AudioSegment.from_file(file_path)
+        # Extract the segment
+        segment = audio[start_time * 1000:end_time * 1000]  # pydub works in milliseconds
+        # Export the segment to a temporary file
+        segment.export(output_path, format="mp3")
+        return output_path
+    except Exception as e:
+        print(f"Error extracting audio segment: {e}")
+        return None

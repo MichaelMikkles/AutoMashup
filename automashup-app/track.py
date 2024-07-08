@@ -164,6 +164,12 @@ class Track:
         # This method should return a list of segments for the given song
         track = Track.track_from_song(track_name, 'entire')
         return [segment.label for segment in track.segments]
+    
+    def get_segments_full(track_name):
+        # This method should return a list of the structure of segments for the given song
+        track = Track.track_from_song(track_name, 'entire')
+        return [{'start': segment.start, 'end': segment.end, 'label': segment.label} for segment in track.segments]
+
 
 
 

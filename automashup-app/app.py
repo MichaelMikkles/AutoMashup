@@ -4,13 +4,17 @@ import allin1
 import json
 import copy
 import pickle
-from barfi import st_barfi, Block , barfi_schemas
+import threading
+from barfi import st_barfi, Block , barfi_schemas, compute_engine
 from st_on_hover_tabs import on_hover_tabs
+
+
 
 from track import Track
 from mashup import mashup_technic_fit_phase, \
 mashup_technic_fit_phase_repitch, mashup_technic, mashup_technic_repitch
-from utils import remove_track, key_from_dict, key_finder
+from utils import remove_track, key_from_dict, key_finder, get_unique_ordered_list,\
+get_path, get_segment_times, extract_audio_segment
 
 
 ## MASHUP METHODS
@@ -34,6 +38,20 @@ st.title("AutoMashup App")
 
 # Application pages : 
 # st.markdown('<style>' + open('./style.css').read() + '</style>', unsafe_allow_html=True)
+
+# Changing the width of the sidebar 
+st.markdown(
+    """
+    <style>
+    /* Custom CSS for the Streamlit sidebar */
+    [data-testid="stSidebar"] {
+        width: 270px !important;  /* Adjust the width as per your preference, important required to overwrite */
+    }
+    """,
+    unsafe_allow_html=True
+)
+
+
 with st.sidebar:
     tabs = on_hover_tabs(tabName=['The project', 'App', 'Contribute'], 
                          iconName=['dvr', 'tune', 'group'], default_choice=0,
@@ -83,13 +101,22 @@ if tabs =='App':
     if os.path.exists('./separated/htdemucs/'):
         st.title('Tracks')
 
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4, col5, col6, col7, col8 = st.columns(8)
         col1.markdown("## Song Name")
         col2.markdown("## BPM")
         col3.markdown("## Key")
-        col4.markdown("## Analysis")
+        col6.markdown("## Segments")
+        col7.markdown("## Instruments")
 
         st.divider()
+
+        segment_times = {
+           "Intro": (0, 5),
+           "Verse": (20, 40),
+           "Chorus": (40, 60),
+           "Bridge": (60, 80),
+           "Outro": (80, 100)
+        }
 
         # for each song, we show some information
         for index, folder_name in enumerate(os.listdir('./separated/htdemucs/')):
@@ -97,7 +124,7 @@ if tabs =='App':
             # we get the file resulting of allin1 analysis
             struct_path = os.path.join('./struct/' + folder_name + '.json')
             if os.path.exists(struct_path):
-                col1, col2, col3, col4, col5 = st.columns(5)
+                col1, col2, col3, col4, col5, col6, col7, col8 = st.columns(8)
                 col1.write(folder_name)
 
                 # then we display some data
@@ -112,6 +139,28 @@ if tabs =='App':
                 if col5.button("Remove Track", key = remove_button_id):
                     remove_track(folder_name)
                     st.rerun()
+
+                # Add dropdown lists for Segments and Instruments
+                segments = Track.get_segments(folder_name)
+                segment_labels = get_unique_ordered_list(segments)  # Remove duplicates and preserve order
+                instruments_options = ["entire", "vocals", "bass", "drums", "other"]
+
+                selected_segment = col6.selectbox('Select Segment', segment_labels, key=f'segment_{index}')
+                selected_instrument = col7.selectbox('Select Instrument', instruments_options, key=f'instrument_{index}') 
+
+                play_button_id = f"play_button_{index}"
+                if col8.button("Play", key=play_button_id):
+                    audio_file_path = get_path(folder_name, selected_instrument)
+                    if os.path.exists(audio_file_path):
+                        segments_full = Track.get_segments_full(folder_name)
+                        start_time, end_time = get_segment_times(segments_full, selected_segment)
+                        st.write(f"Playing segment from {start_time} to {end_time} of {selected_instrument}")  # Debugging line to indicate playback
+                        temp_output_path = f"temp_segment_{index}.mp3"
+                        segment_path = extract_audio_segment(audio_file_path, start_time, end_time, temp_output_path)
+                        if segment_path:
+                            st.audio(segment_path)  # Display the HTML5 audio player
+                    else:
+                        st.error(f"Audio file for {selected_instrument} not found.")
 
     st.divider()
 
@@ -169,6 +218,7 @@ if tabs =='App':
 
         def feed_func(self):
             track_name = self._options['Track']['value']
+            print(track_name, feed._options['Track']['value']) # Ca garde le nom quand on exec
             # spinner to view loading
             with st.spinner('Loading ' + self._name):
                 # a feeder will display all the different tracks of a song 
@@ -181,10 +231,10 @@ if tabs =='App':
                 self.set_interface(name='Other', value=Track.track_from_song(track_name, 'other'))
                 
         feed.add_compute(feed_func)
-
+ 
         # option for choosing the song
         feed.add_option("Track", 'select', value=track_list[0], items=track_list)
-        track_name = feed.get_option("Track")
+        track_name = feed._options['Track']['value']
 
         # Retrieve segments for the selected track
         if track_name:
@@ -192,9 +242,9 @@ if tabs =='App':
             segment_labels = [label for label in segments]
         else:
             segment_labels = []
-
         # Add the option to be able to select 1 segment of the song to include
         feed.add_option("Segment", 'select', value=segment_labels[0] if segment_labels else '', items=segment_labels)
+
 
         ### Merger
         # The merger block is made to combine up to 4 tracks and to 
@@ -293,7 +343,6 @@ if tabs =='App':
 
         # Trigger Barfi, add all the blocks
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
-        print(track_name)
 
 if tabs == 'The project':
     # Application title
