@@ -12,3 +12,4 @@ torch==2.0
 pandas
 pymusickit
 streamlit-on-Hover-tabs
+pydub
