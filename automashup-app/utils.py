@@ -120,3 +120,33 @@ def extract_audio_segment(file_path, start_time, end_time, output_path):
     except Exception as e:
         print(f"Error extracting audio segment: {e}")
         return None
+    
+# Function to merge the segments that have the same label and are next to each other
+def merge_segments(json_path):
+    with open(json_path, 'r') as f:
+        data = json.load(f)
+    
+    merged_segments = []
+    previous_segment = None
+
+    for segment in data.get('segments', []):
+        if previous_segment and previous_segment['label'] == segment['label']:
+            # Merge with the previous segment
+            previous_segment['end'] = segment['end']
+        else:
+            # Add the previous segment to the list if it exists
+            if previous_segment:
+                merged_segments.append(previous_segment)
+            # Update the previous segment
+            previous_segment = segment
+    
+    # Add the last segment
+    if previous_segment:
+        merged_segments.append(previous_segment)
+    
+    # Update the segments in the data
+    data['segments'] = merged_segments
+    
+    # Save the modified data back to the JSON file
+    with open(json_path, 'w') as f:
+        json.dump(data, f, indent=2)

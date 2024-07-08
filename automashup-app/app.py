@@ -14,7 +14,7 @@ from track import Track
 from mashup import mashup_technic_fit_phase, \
 mashup_technic_fit_phase_repitch, mashup_technic, mashup_technic_repitch
 from utils import remove_track, key_from_dict, key_finder, get_unique_ordered_list,\
-get_path, get_segment_times, extract_audio_segment
+get_path, get_segment_times, extract_audio_segment, merge_segments
 
 
 ## MASHUP METHODS
@@ -91,6 +91,8 @@ if tabs =='App':
                 
                 #trigger analyze
                 allin1.analyze(path, out_dir='./struct', demix_dir='./separated', keep_byproducts=True)
+                json_path = os.path.join('./struct', f'{os.path.splitext(os.path.basename(path))[0]}.json')
+                merge_segments(json_path)
                 key_finder(path)
                 audio_file = None
 
