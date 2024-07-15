@@ -13,3 +13,4 @@ pandas
 pymusickit
 streamlit-on-Hover-tabs
 pydub
+soundfile
