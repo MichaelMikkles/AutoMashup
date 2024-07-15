@@ -34,7 +34,7 @@ def mashup_technic(tracks):
         # reset first downbeat position
         track_audio_no_offset = np.array(track_audio)[round(track_beginning):] 
 
-        # multiply by bpm rate
+        # multiply by bpm rate (Is there key shifting?)
         track_audio_accelerated = librosa.effects.time_stretch(track_audio_no_offset, rate = tempo / track_tempo)
 
         # add the right number of zeros to align with the main track

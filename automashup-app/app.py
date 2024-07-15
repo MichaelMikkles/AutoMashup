@@ -1,10 +1,12 @@
 import streamlit as st
 import os
+import io
 import allin1
 import json
 import copy
 import pickle
-import threading
+import plotly.graph_objects as go
+import soundfile as sf
 from barfi import st_barfi, Block , barfi_schemas, compute_engine
 from st_on_hover_tabs import on_hover_tabs
 
@@ -112,14 +114,6 @@ if tabs =='App':
 
         st.divider()
 
-        segment_times = {
-           "Intro": (0, 5),
-           "Verse": (20, 40),
-           "Chorus": (40, 60),
-           "Bridge": (60, 80),
-           "Outro": (80, 100)
-        }
-
         # for each song, we show some information
         for index, folder_name in enumerate(os.listdir('./separated/htdemucs/')):
 
@@ -139,8 +133,12 @@ if tabs =='App':
 
                 remove_button_id = f"remove_button_{index}"
                 if col5.button("Remove Track", key = remove_button_id):
-                    remove_track(folder_name)
-                    st.rerun()
+                    st.warning("Are you sure you want to remove this track?", icon="⚠️")
+                    if st.button("Confirm Remove Track"):
+                        remove_track(folder_name)
+                        st.rerun()
+                    if st.button("Cancel"):
+                        st.rerun()
 
                 # Add dropdown lists for Segments and Instruments
                 segments = Track.get_segments(folder_name)
@@ -217,10 +215,18 @@ if tabs =='App':
         feed.add_output(name='Bass')
         feed.add_output(name='Drums')
         feed.add_output(name='Other')
+        
+        first_time=True
+        
 
-        def feed_func(self):
+        def feed_func(self): 
+            global main_track, first_time
             track_name = self._options['Track']['value']
-            print(track_name, feed._options['Track']['value']) # Ca garde le nom quand on exec
+            if first_time:
+                main_track=track_name
+                print(main_track)
+                first_time=False
+            # print(track_name) # Ca garde le nom quand on exec
             # spinner to view loading
             with st.spinner('Loading ' + self._name):
                 # a feeder will display all the different tracks of a song 
@@ -232,21 +238,12 @@ if tabs =='App':
                 self.set_interface(name='Drums', value=Track.track_from_song(track_name, 'drums'))
                 self.set_interface(name='Other', value=Track.track_from_song(track_name, 'other'))
                 
+                
         feed.add_compute(feed_func)
  
         # option for choosing the song
         feed.add_option("Track", 'select', value=track_list[0], items=track_list)
-        track_name = feed._options['Track']['value']
-
-        # Retrieve segments for the selected track
-        if track_name:
-            segments = Track.get_segments(track_name)
-            segment_labels = [label for label in segments]
-        else:
-            segment_labels = []
-        # Add the option to be able to select 1 segment of the song to include
-        feed.add_option("Segment", 'select', value=segment_labels[0] if segment_labels else '', items=segment_labels)
-
+        
 
         ### Merger
         # The merger block is made to combine up to 4 tracks and to 
@@ -313,6 +310,10 @@ if tabs =='App':
                     st.markdown("### "+self._name + " : " + track.name)
                     mashup, sr = track.audio, track.sr
                     st.audio(mashup, sample_rate=sr)
+                    audio_bytes = io.BytesIO()
+                    sf.write(audio_bytes, mashup, sr, format='WAV')
+                    audio_bytes.seek(0)
+                    st.download_button(label="Download result", data=audio_bytes, file_name=track.name + '.wav', mime="audio/wav")
                 st.divider()
 
         player.add_compute(player_func)
@@ -345,6 +346,8 @@ if tabs =='App':
 
         # Trigger Barfi, add all the blocks
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
+
+        
 
 if tabs == 'The project':
     # Application title
