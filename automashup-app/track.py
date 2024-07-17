@@ -64,18 +64,19 @@ class Track:
         return best_key
 
 
-    def __repitch(self, semitone_shift):
+    def __repitch(self, semitone_shift, audio):
         # Function to repitch a track using a semitone shift
         # https://www.youtube.com/watch?v=Y2lUmwB7lzI
-        shifted_audio = librosa.effects.pitch_shift(y=self.audio, sr=self.sr, n_steps=semitone_shift)
+        shifted_audio = librosa.effects.pitch_shift(y=audio, sr=self.sr, n_steps=semitone_shift)
         self.audio = shifted_audio
+        return self.audio
 
 
-    def pitch_track(self, target_key):
+    def pitch_track(self, target_key, audio):
         # Function to repitch a track to a target key
         target_frequency = note_to_frequency(target_key)
         track_frequency = note_to_frequency(self.get_key())
-        self.__repitch(calculate_pitch_shift(track_frequency, target_frequency))
+        return self.__repitch(calculate_pitch_shift(track_frequency, target_frequency), audio)
 
 
     def add_metronome(self):

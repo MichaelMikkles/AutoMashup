@@ -217,15 +217,17 @@ if tabs =='App':
         feed.add_output(name='Other')
         
         first_time=True
-        
+        other_tracks = []        
 
         def feed_func(self): 
-            global main_track, first_time
+            global main_track, first_time, other_tracks
             track_name = self._options['Track']['value']
             if first_time:
                 main_track=track_name
-                print(main_track)
                 first_time=False
+            else:
+                if track_name not in other_tracks:
+                    other_tracks.append(track_name)
             # print(track_name) # Ca garde le nom quand on exec
             # spinner to view loading
             with st.spinner('Loading ' + self._name):
@@ -347,7 +349,50 @@ if tabs =='App':
         # Trigger Barfi, add all the blocks
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
 
-        
+        if barfi_result:
+            # Retrieve the main segments
+            main_segments = Track.get_segments(main_track)
+            num_segments = len(main_segments)
+            st.write(main_track)
+            row1 = st.columns(num_segments)
+
+            # Display the main segments in the first row
+            for col, segment in zip(row1, main_segments):
+                tile = col.container(height=100)
+                tile.title(segment)
+
+            # Get unique elements from other_tracks
+            unique_tracks = list(set(other_tracks))
+            st.write(unique_tracks)
+
+            # Create a dictionary to store the matching segments for each main segment
+            segments_dict = {segment: [] for segment in main_segments}
+
+            # Iterate over unique tracks
+            for track in unique_tracks:
+                # Retrieve segments for the current track
+                track_segments = Track.get_segments(track)
+
+                # Compare the segments of the current track with main_segments
+                for segment in track_segments:
+                    if segment in segments_dict:
+                        # Append the matching segment to the dictionary
+                        segments_dict[segment].append(segment)
+
+            # Display the matching segments below the corresponding main segments
+            i=0
+            for col, main_segment in zip(row1, main_segments):
+                # Retrieve the matching segments for the current main segment
+                matching_segments = segments_dict[main_segment]
+
+                # Display each matching segment below the main segment
+                for match in matching_segments:
+                    tile = col.container(height=100)
+                    tile.title(match)
+
+
+
+
 
 if tabs == 'The project':
     # Application title

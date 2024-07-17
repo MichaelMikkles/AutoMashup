@@ -9,8 +9,8 @@ import numpy as np
 # You may find useful methods in the track.py file
 # Be sure to return a Track object
 
-def mashup_technic(tracks):
-    # Mashup technic with first downbeat alignment and bpm sync
+def mashup_technic(tracks, repitch=False):
+    # Mashup technic with first beat alignment and bpm sync
     sr = tracks[0].sr # The first track is used to determine the target bpm
     tempo = tracks[0].bpm
     main_track_length = len(tracks[0].audio)
@@ -31,11 +31,17 @@ def mashup_technic(tracks):
         track_beginning = track_beginning_temporal * track_sr
         track_audio = track.audio
 
-        # reset first downbeat position
+        # reset first beat position
         track_audio_no_offset = np.array(track_audio)[round(track_beginning):] 
 
-        # multiply by bpm rate (Is there key shifting?)
+        # multiply by bpm rate 
         track_audio_accelerated = librosa.effects.time_stretch(track_audio_no_offset, rate = tempo / track_tempo)
+
+        # mashup technic which repiches every track to the first one
+        # The repitch must be the last step for it to be effective
+        if repitch == True and track != tracks[0]:
+            key = tracks[0].get_key() # target key
+            track_audio_accelerated = track.pitch_track(key, track_audio_accelerated) # repitch
 
         # add the right number of zeros to align with the main track
         final_track_audio = np.concatenate((np.zeros(round(beginning)), track_audio_accelerated)) 
@@ -50,6 +56,9 @@ def mashup_technic(tracks):
     else:
         mashup = increase_array_size(mashup, main_track_length)
 
+    
+    
+
     # we return a modified version of the first track
     # doing so, we keep its metadata
     tracks[0].audio = mashup
@@ -58,16 +67,11 @@ def mashup_technic(tracks):
 
 
 def mashup_technic_repitch(tracks):
-    # mashup technic which repiches every track to the first one
-    key = tracks[0].get_key() # target key
-    for i in range(len(tracks)-1):
-        tracks[i+1].pitch_track(key) # repitch
-    
-    # standard mashup method
-    return mashup_technic(tracks)
+    # standard mashup method calling repitch
+    return mashup_technic(tracks, repitch=True)
 
 
-def mashup_technic_fit_phase(tracks):
+def mashup_technic_fit_phase(tracks, repitch = False):
     # Mashup technique with phase alignment (i.e., chorus with chorus, verse with verse...)
     # Each track's structure is aligned with the first one
     
@@ -75,15 +79,9 @@ def mashup_technic_fit_phase(tracks):
         tracks[i + 1].fit_phase(tracks[0])
 
     # Standard mashup method
-    return mashup_technic(tracks)
+    return mashup_technic(tracks, repitch)
 
 def mashup_technic_fit_phase_repitch(tracks):
     # Mashup technique with phase alignment and repitch
-    # Repitch
-    
-    key = tracks[0].get_key()    
-    for i in range(len(tracks) - 1):
-        tracks[i + 1].pitch_track(key)
-
     # Phase fit mashup
-    return mashup_technic_fit_phase(tracks)
+    return mashup_technic_fit_phase(tracks, repitch = True)
