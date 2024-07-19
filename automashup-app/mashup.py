@@ -1,4 +1,4 @@
-from utils import increase_array_size
+from utils import increase_array_size, adjust_bpm
 import librosa
 import numpy as np
 
@@ -35,6 +35,7 @@ def mashup_technic(tracks, repitch=False):
         track_audio_no_offset = np.array(track_audio)[round(track_beginning):] 
 
         # multiply by bpm rate 
+        tempo = adjust_bpm(track.bpm, tempo)
         track_audio_accelerated = librosa.effects.time_stretch(track_audio_no_offset, rate = tempo / track_tempo)
 
         # mashup technic which repiches every track to the first one
@@ -42,6 +43,8 @@ def mashup_technic(tracks, repitch=False):
         if repitch == True and track != tracks[0]:
             key = tracks[0].get_key() # target key
             track_audio_accelerated = track.pitch_track(key, track_audio_accelerated) # repitch
+
+        
 
         # add the right number of zeros to align with the main track
         final_track_audio = np.concatenate((np.zeros(round(beginning)), track_audio_accelerated)) 

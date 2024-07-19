@@ -350,47 +350,40 @@ if tabs =='App':
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
 
         if barfi_result:
+            st.write("# Segments summary")
+
+
             # Retrieve the main segments
             main_segments = Track.get_segments(main_track)
             num_segments = len(main_segments)
             st.write(main_track)
-            row1 = st.columns(num_segments)
-
+            
             # Display the main segments in the first row
+            row1 = st.columns(num_segments)
             for col, segment in zip(row1, main_segments):
-                tile = col.container(height=100)
+                tile = col.container(border=True)
                 tile.title(segment)
-
-            # Get unique elements from other_tracks
-            unique_tracks = list(set(other_tracks))
-            st.write(unique_tracks)
-
-            # Create a dictionary to store the matching segments for each main segment
-            segments_dict = {segment: [] for segment in main_segments}
-
-            # Iterate over unique tracks
-            for track in unique_tracks:
-                # Retrieve segments for the current track
-                track_segments = Track.get_segments(track)
-
-                # Compare the segments of the current track with main_segments
-                for segment in track_segments:
-                    if segment in segments_dict:
-                        # Append the matching segment to the dictionary
-                        segments_dict[segment].append(segment)
-
-            # Display the matching segments below the corresponding main segments
-            i=0
-            for col, main_segment in zip(row1, main_segments):
-                # Retrieve the matching segments for the current main segment
-                matching_segments = segments_dict[main_segment]
-
-                # Display each matching segment below the main segment
-                for match in matching_segments:
-                    tile = col.container(height=100)
-                    tile.title(match)
-
-
+            
+            # Iterate through other_tracks and display their segments
+            for other_track in other_tracks:
+                st.write(other_track)
+                
+                # Retrieve segments for the current other_track
+                other_segments = Track.get_segments(other_track)
+                
+                # Create a new row with the same number of columns as the main row
+                row = st.columns(num_segments)
+                
+                # Display the segments of the other_track in the new row
+                for i, col in enumerate(row):
+                    tile = col.container(border=True)
+                    for main_segment in main_segments:
+                        if main_segment in other_segments:  # Check if segment exists in other_segments
+                            tile.title(main_segment)
+                        else:
+                            tile.title("")
+                        main_segments.pop(0)
+                        break
 
 
 
