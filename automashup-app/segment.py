@@ -92,6 +92,7 @@ class Segment:
         Parameters:
         - beat_number: The target number of beats for the segment.
         - tempo: The target tempo (BPM) for the segment.
+        - duration: The target segment duration 
 
         Returns:
         - A new audio segment adjusted to the specified number of beats and tempo.

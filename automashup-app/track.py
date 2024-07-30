@@ -114,19 +114,31 @@ class Track:
         print(f" ********************** Adjusting the song {self.name}  **********************")
 
         # loop over each phase to reproduce
+        found_segments = {}
+
         for target_segment in target_track.segments:
             i = 0
             found_segment = False
+            current_label = target_segment.label
 
-            # we look for a segment of our modified with the same phase
-            # as the one we try to reproduce
+            # We want to align the segments in order of appearance
             while i < len(self.segments):
                 segment = self.segments[i]
-                if segment.label == target_segment.label:
-                    found_segment = True
-                    tempo = round(len(segment.beats)/segment.duration)
-                    break
+                if segment.label == current_label:
+                    # If this is the first time we find the label or we have moved past the previous index
+                    if not found_segment or i > found_segments[current_label]:
+                        found_segment = True
+                        tempo = round(len(segment.beats) / segment.duration)
+                        found_segments[current_label] = i
+                        break
                 i += 1
+
+            # If no segment was found, reuse the last found segment
+            if not found_segment and current_label in found_segments:
+                last_found_index = found_segments[current_label]
+                segment = self.segments[last_found_index]
+                tempo = round(len(segment.beats) / segment.duration)
+                found_segment = True
 
             # if we do not find it, we add zeros with the right length
             if (not found_segment):
