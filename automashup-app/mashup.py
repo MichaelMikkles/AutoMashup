@@ -1,4 +1,4 @@
-from utils import increase_array_size, adjust_bpm
+from utils import increase_array_size
 import librosa
 import numpy as np
 
@@ -9,7 +9,7 @@ import numpy as np
 # You may find useful methods in the track.py file
 # Be sure to return a Track object
 
-def mashup_technic(tracks, repitch=False):
+def mashup_technic(tracks, repitch=False, phase_fit=False):
     # Mashup technic with first beat alignment and bpm sync
     sr = tracks[0].sr # The first track is used to determine the target bpm
     tempo = tracks[0].bpm
@@ -32,19 +32,20 @@ def mashup_technic(tracks, repitch=False):
         track_audio = track.audio
 
         # reset first beat position
+        print("***********Track beginning : ", track_beginning_temporal)
         track_audio_no_offset = np.array(track_audio)[round(track_beginning):] 
 
-        # multiply by bpm rate 
-        tempo = adjust_bpm(track.bpm, tempo)
-        track_audio_accelerated = librosa.effects.time_stretch(track_audio_no_offset, rate = tempo / track_tempo)
+        # multiply by bpm rate if there is no phase fit
+        if not phase_fit:
+            track_audio_accelerated = librosa.effects.time_stretch(track_audio_no_offset, rate = tempo / track_tempo)
+        else:
+            track_audio_accelerated = track_audio_no_offset
 
         # mashup technic which repiches every track to the first one
         # The repitch must be the last step for it to be effective
         if repitch == True and track != tracks[0]:
             key = tracks[0].get_key() # target key
             track_audio_accelerated = track.pitch_track(key, track_audio_accelerated) # repitch
-
-        
 
         # add the right number of zeros to align with the main track
         final_track_audio = np.concatenate((np.zeros(round(beginning)), track_audio_accelerated)) 
@@ -82,7 +83,7 @@ def mashup_technic_fit_phase(tracks, repitch = False):
         tracks[i + 1].fit_phase(tracks[0])
 
     # Standard mashup method
-    return mashup_technic(tracks, repitch)
+    return mashup_technic(tracks, repitch, phase_fit=True)
 
 def mashup_technic_fit_phase_repitch(tracks):
     # Mashup technique with phase alignment and repitch

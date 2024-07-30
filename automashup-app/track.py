@@ -133,37 +133,41 @@ class Track:
                 tempo = round(len(target_segment.beats)/target_segment.duration)
                 print(f"Couldn't find segment: {target_segment.label} at {target_segment.start}")
                 try:
-                    segment_length = int((len(target_segment.beats) / (tempo / 60) * self.sr))
-                    print("###########FLAG#########")
+                    if tempo == 0:
+                        segment_length = 0
+                    else:
+                        segment_length = int((len(target_segment.beats) / (tempo / 60) * self.sr))
                     audio = np.concatenate([audio, np.zeros(segment_length)])
                     beats += [beats[-1] + (i + 1) / (tempo / 60) for i in range(len(target_segment.beats))]
                     downbeats += [downbeats[-1] + (4 * i + 1) / (tempo / 60) for i in range(len(target_segment.beats) // 4)]
                 except Exception as e:
-                    print(e)
+                    print(f"Error fitting silence. Error: {e}")
             else:
                 print(f"Matching segment found: {segment.label} at {segment.start} with segment {target_segment.label} at {target_segment.start}")
                 # For some songs, dimensions of beats arrays won't match so 
                 # added try exception
                 try:
                     # if we find it, we make it fitted to the desired beat number
-                    target_bpm = len(target_segment.beats)/target_segment.duration
-                    print("##target segment information.##")
-                    print("amount of beats: ", len(target_segment.beats), "duration in seconds: ", target_segment.duration*60)
+                    if len(target_segment.beats) > 0:
+                        target_bpm = len(target_segment.beats)/target_segment.duration
+                        print("##target segment information.##")
+                        print("amount of beats: ", len(target_segment.beats), "duration in seconds: ", target_segment.duration*60)
 
-                    segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio))
-                    audio = np.concatenate([audio, segment_fitted.audio])
+                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio))
+                        audio = np.concatenate([audio, segment_fitted.audio])
 
-                    # reset first beat position per segment
-                    track_sr = target_track.sr
-                    track_beginning_temporal = target_segment.beats[0]
-                    track_beginning = track_beginning_temporal * track_sr
-                    print("------------Track beginning : ", track_beginning_temporal)
-                    # reset first beat position
-                    audio = np.array(audio)[round(track_beginning):] 
+                        # reset first beat position per segment
+                        track_sr = target_track.sr
+                        track_beginning_temporal = target_segment.beats[0]
+                        track_beginning = track_beginning_temporal * track_sr
+                        print("------------Track beginning : ", track_beginning_temporal)
+                        # reset first beat position
+                        audio = np.array(audio)[round(track_beginning):] 
 
-                    # we add the new beats to be able to sync after
-                    beats += [beats[-1] + phase_beat for phase_beat in segment_fitted.beats]
-                    downbeats += [downbeats[-1] + phase_downbeat for phase_downbeat in segment_fitted.downbeats]
+                        # we add the new beats to be able to sync after
+                        beats += [beats[-1] + phase_beat for phase_beat in segment_fitted.beats]
+                        downbeats += [downbeats[-1] + phase_downbeat for phase_downbeat in segment_fitted.downbeats]
+                    else: pass
                 except Exception as e:
                     print(f"Error fitting segment: {segment.label} at {segment.start}, Error: {e}")
                     continue
