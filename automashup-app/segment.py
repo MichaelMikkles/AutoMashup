@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import librosa
 from utils import closest_index
 
 # Define a Track class to represent a part of a track
@@ -18,9 +19,14 @@ class Segment:
         #   "end": 22.82,
         #   "label": "verse"
         # }
+        
 
         for key in segment_dict.keys():
             setattr(self, key, segment_dict[key])
+
+        # We calculate the time in minutes for each segment
+        self.duration = (self.end - self.start)/60
+
 
 
     def link_track(self, track):
@@ -31,11 +37,12 @@ class Segment:
         beats = track.beats
         downbeats = track.downbeats
         
+        
         start_beat = closest_index(self.start, beats)
         end_beat = closest_index(self.end, beats)
 
         self.beats = beats[start_beat:end_beat]
-        
+
         if self.beats == []:
             self.downbeats = []
             self.audio = np.array([])
@@ -43,6 +50,7 @@ class Segment:
             self.right_transition = np.array([])
 
         else:
+            # Make sure the first beat and downbeat starts on zero 
             self.beats = self.beats - np.repeat(self.beats[0], len(self.beats))
 
             self.downbeats = downbeats - np.repeat(downbeats[0], len(downbeats))
@@ -62,11 +70,6 @@ class Segment:
                 self.right_transition = track.audio[round(self.end*self.sr):]
 
     def concatenate(self):
-        # Functions to concatenate two segments, and to keep track of beats and downbeats
-
-        # Calculate the transition length (optional, if you need to handle transitions between segments)
-        # transition_length = min(len(self.right_transition), len(segment.left_transition))
-        
         # Calculate the seconds to shift the incoming beats to start where the current segment's audio ends.
         offset = len(self.audio) / self.sr
 
@@ -82,10 +85,17 @@ class Segment:
         self.audio = np.concatenate((self.audio, self.audio))
 
 
+    def get_audio_beat_fitted(self, beat_number, tempo, duration):
+        """
+        Adjusts the audio segment to fit a specified number of beats at a given tempo.
 
+        Parameters:
+        - beat_number: The target number of beats for the segment.
+        - tempo: The target tempo (BPM) for the segment.
 
-    def get_audio_beat_fitted(self, beat_number):
-        #Fit the segment to a specified number of beats.
+        Returns:
+        - A new audio segment adjusted to the specified number of beats and tempo.
+        """
         try:
             # Make a deep copy of the segment to avoid modifying the original
             result = copy.deepcopy(self)
@@ -96,20 +106,39 @@ class Segment:
                 result.beats = []
                 result.downbeats = []
             else:
-                # Ensure the segment's beats match or exceed the target beat_number
+                # We compare the bpm of the target segment and the current segment. 
+                # If the difference is too big, half or double it
+                segment_bpm =(len(result.beats)/result.duration)
+                if tempo / segment_bpm > 1.5:
+                    tempo /= 2
+                    beat_number //= 2
+                    # If we reduce the bpm to half, then the amount of beats as well so the duration stays the same
+                elif tempo / segment_bpm < 0.75:
+                    tempo *= 2
+                    beat_number //= 2
+                else:
+                    pass
+
+                # We calculate the rate of stretch for the segment.
+                stretch_rate = tempo / segment_bpm
+                print("the bpm change rate is for: ", stretch_rate)
+                result.audio = librosa.effects.time_stretch(result.audio, rate=stretch_rate)
+
+                # We concatenate the segment to itself if it's shorter than the target
                 while len(result.beats) < beat_number:
+                    print(f"Concatenating for segment '{result.label}'")
                     result.concatenate()
 
-                # Adjust audio length to fit beat_number
-                new_length = round(len(result.audio) * (beat_number / len(result.beats)))
-                result.audio = result.audio[:new_length]
+                # Then we cut the amount of beats and downbeats so they end at the same time
                 result.beats = result.beats[:beat_number]
-                result.downbeats = [downbeat for downbeat in result.downbeats if downbeat < result.beats[-1]]
+                result.downbeats = [downbeat for downbeat in result.downbeats if downbeat <= result.beats[-1]]
+
+                # Then we cut the audio for the same length as the objetive
+                result.audio = result.audio[:duration]
 
             return result
 
         except Exception as e:
             # Handle any exceptions gracefully and print detailed error message
-            print(f"Error fitting segment {self.label} to {beat_number} beats: {e}")
-            # Return None or raise the exception based on your error handling strategy
+            print(f"Error fitting segment '{self.label}' to {beat_number} beats: {e}")
             raise e  # or return None or handle the error appropriately

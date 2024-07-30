@@ -115,7 +115,6 @@ class Track:
 
         # loop over each phase to reproduce
         for target_segment in target_track.segments:
-            print(f"searching the fragment {target_segment.label}")
             i = 0
             found_segment = False
 
@@ -125,26 +124,42 @@ class Track:
                 segment = self.segments[i]
                 if segment.label == target_segment.label:
                     found_segment = True
+                    tempo = round(len(segment.beats)/segment.duration)
                     break
                 i += 1
 
             # if we do not find it, we add zeros with the right length
-            if not found_segment:
+            if (not found_segment):
+                tempo = round(len(target_segment.beats)/target_segment.duration)
                 print(f"Couldn't find segment: {target_segment.label} at {target_segment.start}")
-                segment_length = int(len(target_segment.beats) / (self.bpm / 60) * self.sr)
-                audio = np.concatenate([audio, np.zeros(segment_length)])
-                beats += [beats[-1] + (i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats))]
-
-                
-                downbeats += [downbeats[-1] + (4 * i + 1) / (self.bpm / 60) for i in range(len(target_segment.beats) // 4)]
+                try:
+                    segment_length = int((len(target_segment.beats) / (tempo / 60) * self.sr))
+                    print("###########FLAG#########")
+                    audio = np.concatenate([audio, np.zeros(segment_length)])
+                    beats += [beats[-1] + (i + 1) / (tempo / 60) for i in range(len(target_segment.beats))]
+                    downbeats += [downbeats[-1] + (4 * i + 1) / (tempo / 60) for i in range(len(target_segment.beats) // 4)]
+                except Exception as e:
+                    print(e)
             else:
                 print(f"Matching segment found: {segment.label} at {segment.start} with segment {target_segment.label} at {target_segment.start}")
                 # For some songs, dimensions of beats arrays won't match so 
                 # added try exception
                 try:
                     # if we find it, we make it fitted to the desired beat number
-                    segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats))
+                    target_bpm = len(target_segment.beats)/target_segment.duration
+                    print("##target segment information.##")
+                    print("amount of beats: ", len(target_segment.beats), "duration in seconds: ", target_segment.duration*60)
+
+                    segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio))
                     audio = np.concatenate([audio, segment_fitted.audio])
+
+                    # reset first beat position per segment
+                    track_sr = target_track.sr
+                    track_beginning_temporal = target_segment.beats[0]
+                    track_beginning = track_beginning_temporal * track_sr
+                    print("------------Track beginning : ", track_beginning_temporal)
+                    # reset first beat position
+                    audio = np.array(audio)[round(track_beginning):] 
 
                     # we add the new beats to be able to sync after
                     beats += [beats[-1] + phase_beat for phase_beat in segment_fitted.beats]

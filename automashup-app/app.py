@@ -264,6 +264,7 @@ if tabs =='App':
         merger.add_option("Method", 'select', value=next(iter(mashup_technics)), items=list(mashup_technics.keys()))
     
         def merger_func(self):
+            global technique
             # spinner to view loading
             with st.spinner('Computing ' + self._name):
                 # we make a copy of each input because the objects may
@@ -282,6 +283,7 @@ if tabs =='App':
                     tracks = [track for track in tracks if track is not None]
                     # we apply the mashup technic
                     self.set_interface(name="Result", value=mashup_technics[self._options['Method']['value']](tracks))
+                    technique = mashup_technics[self._options['Method']['value']]
         
 
         merger.add_compute(merger_func)
@@ -349,8 +351,8 @@ if tabs =='App':
         # Trigger Barfi, add all the blocks
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
 
-        if barfi_result:
-            st.write("# Segments summary")
+        if barfi_result :
+            st.write("# Segments alignment")
 
 
             # Retrieve the main segments
