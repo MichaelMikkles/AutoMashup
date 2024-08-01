@@ -5,9 +5,8 @@ import allin1
 import json
 import copy
 import pickle
-import plotly.graph_objects as go
 import soundfile as sf
-from barfi import st_barfi, Block , barfi_schemas, compute_engine
+from barfi import st_barfi, Block , barfi_schemas
 from st_on_hover_tabs import on_hover_tabs
 
 

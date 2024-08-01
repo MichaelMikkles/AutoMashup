@@ -42,7 +42,6 @@ def mashup_technic(tracks, repitch=False, phase_fit=False):
             track_audio_accelerated = track_audio_no_offset
 
         # mashup technic which repiches every track to the first one
-        # The repitch must be the last step for it to be effective
         if repitch == True and track != tracks[0]:
             key = tracks[0].get_key() # target key
             track_audio_accelerated = track.pitch_track(key, track_audio_accelerated) # repitch

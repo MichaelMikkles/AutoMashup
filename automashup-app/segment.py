@@ -122,7 +122,6 @@ class Segment:
 
                 # We calculate the rate of stretch for the segment.
                 stretch_rate = tempo / segment_bpm
-                print("the bpm change rate is for: ", stretch_rate)
                 result.audio = librosa.effects.time_stretch(result.audio, rate=stretch_rate)
 
                 # We concatenate the segment to itself if it's shorter than the target

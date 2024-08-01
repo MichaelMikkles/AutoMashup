@@ -121,6 +121,14 @@ class Track:
             found_segment = False
             current_label = target_segment.label
 
+            # Check if we have already found this label before
+            if current_label in found_segments:
+                start_index = found_segments[current_label] + 1
+            else:
+                start_index = 0
+
+            i = start_index
+
             # We want to align the segments in order of appearance
             while i < len(self.segments):
                 segment = self.segments[i]
@@ -156,10 +164,8 @@ class Track:
                     print(f"Error fitting silence. Error: {e}")
             else:
                 print(f"Matching segment found: {segment.label} at {segment.start} with segment {target_segment.label} at {target_segment.start}")
-                # For some songs, dimensions of beats arrays won't match so 
-                # added try exception
                 try:
-                    # if we find it, we make it fitted to the desired beat number
+                    # if we find it, we make it fit to the desired beat number
                     if len(target_segment.beats) > 0:
                         target_bpm = len(target_segment.beats)/target_segment.duration
                         print("##target segment information.##")

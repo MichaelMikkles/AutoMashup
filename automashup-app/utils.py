@@ -151,27 +151,3 @@ def merge_segments(json_path):
     with open(json_path, 'w') as f:
         json.dump(data, f, indent=2)
 
-# Function to normalize the bpm when the difference of 2 tracks is too big
-
-# def adjust_bpm(track_bpm, target_bpm):
-#     times = 1
-#     op=""
-#     # Valeur aleatoire
-#     while(times < 5):
-#         # Calculate the BPM ratio
-#         bpm_ratio = target_bpm / track_bpm
-
-#         # Normalize the ratio to be within a musically acceptable range
-#         if bpm_ratio > 1.5:
-#             target_bpm = target_bpm / 2
-#             times += 1
-#             # Depending on the operation, we change the amount of beats in other functions
-#             op="divide"
-#         elif bpm_ratio < 0.75:
-#             target_bpm = target_bpm * 2
-#             times += 1
-#             op="multiply"
-#         else:
-#             normalized_bpm = target_bpm
-#             break
-#     return normalized_bpm, times, op
