@@ -141,7 +141,7 @@ if tabs =='App':
 
                 # Add dropdown lists for Segments and Instruments
                 segments = Track.get_segments(folder_name)
-                segment_labels = get_unique_ordered_list(segments)  # Remove duplicates and preserve order
+                segment_labels = get_unique_ordered_list(segments)  # Remove duplicates (future work)
                 instruments_options = ["entire", "vocals", "bass", "drums", "other"]
 
                 selected_segment = col6.selectbox('Select Segment', segment_labels, key=f'segment_{index}')
