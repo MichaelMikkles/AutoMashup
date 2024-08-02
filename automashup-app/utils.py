@@ -150,4 +150,3 @@ def merge_segments(json_path):
     # Save the modified data back to the JSON file
     with open(json_path, 'w') as f:
         json.dump(data, f, indent=2)
-

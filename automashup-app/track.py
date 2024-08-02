@@ -64,19 +64,18 @@ class Track:
         return best_key
 
 
-    def __repitch(self, semitone_shift, audio):
+    def __repitch(self, semitone_shift):
         # Function to repitch a track using a semitone shift
         # https://www.youtube.com/watch?v=Y2lUmwB7lzI
-        shifted_audio = librosa.effects.pitch_shift(y=audio, sr=self.sr, n_steps=semitone_shift)
+        shifted_audio = librosa.effects.pitch_shift(y=self.audio, sr=self.sr, n_steps=semitone_shift)
         self.audio = shifted_audio
-        return self.audio
 
 
-    def pitch_track(self, target_key, audio):
+    def pitch_track(self, target_key):
         # Function to repitch a track to a target key
         target_frequency = note_to_frequency(target_key)
         track_frequency = note_to_frequency(self.get_key())
-        return self.__repitch(calculate_pitch_shift(track_frequency, target_frequency), audio)
+        self.__repitch(calculate_pitch_shift(track_frequency, target_frequency))
 
 
     def add_metronome(self):
@@ -207,10 +206,3 @@ class Track:
         # This method should return a list of the structure of segments for the given song
         track = Track.track_from_song(track_name, 'entire')
         return [{'start': segment.start, 'end': segment.end, 'label': segment.label} for segment in track.segments]
-
-
-
-
-
-
-

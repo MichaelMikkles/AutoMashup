@@ -41,11 +41,6 @@ def mashup_technic(tracks, repitch=False, phase_fit=False):
         else:
             track_audio_accelerated = track_audio_no_offset
 
-        # mashup technic which repiches every track to the first one
-        if repitch == True and track != tracks[0]:
-            key = tracks[0].get_key() # target key
-            track_audio_accelerated = track.pitch_track(key, track_audio_accelerated) # repitch
-
         # add the right number of zeros to align with the main track
         final_track_audio = np.concatenate((np.zeros(round(beginning)), track_audio_accelerated)) 
 
@@ -71,10 +66,14 @@ def mashup_technic(tracks, repitch=False, phase_fit=False):
 
 def mashup_technic_repitch(tracks):
     # standard mashup method calling repitch
+    key = tracks[0].get_key() # target key
+    for i in range(len(tracks)-1):
+        tracks[i+1].pitch_track(key) # repitch
+
     return mashup_technic(tracks, repitch=True)
 
 
-def mashup_technic_fit_phase(tracks, repitch = False):
+def mashup_technic_fit_phase(tracks):
     # Mashup technique with phase alignment (i.e., chorus with chorus, verse with verse...)
     # Each track's structure is aligned with the first one
     
@@ -82,9 +81,12 @@ def mashup_technic_fit_phase(tracks, repitch = False):
         tracks[i + 1].fit_phase(tracks[0])
 
     # Standard mashup method
-    return mashup_technic(tracks, repitch, phase_fit=True)
+    return mashup_technic(tracks, phase_fit=True)
 
 def mashup_technic_fit_phase_repitch(tracks):
     # Mashup technique with phase alignment and repitch
     # Phase fit mashup
-    return mashup_technic_fit_phase(tracks, repitch = True)
+    key = tracks[0].get_key() # target key
+    for i in range(len(tracks)-1):
+        tracks[i+1].pitch_track(key) # repitch
+    return mashup_technic_fit_phase(tracks )
