@@ -100,7 +100,7 @@ if tabs =='App':
         st.success('Preprocessing completed !')
 
 
-    # Song list
+    # Song list display
     if os.path.exists('./separated/htdemucs/'):
         st.title('Tracks')
 
@@ -182,12 +182,6 @@ if tabs =='App':
         # Each block will be linked to a compute function which will take 
         # effect when we execute the workflow
 
-        ### Feeder
-        # The feeder is the block which enables to select a song as input
-        # It enables to select a song from the ones we already processed 
-        # It gives 5 outputs of type Track, corresponding to the separated
-        # or entire versions of the selected song
-
         try:
             schemas = barfi_schemas()
         except Exception as e:
@@ -204,6 +198,11 @@ if tabs =='App':
         if load_schema == 'Start New':
             load_schema = None  # Set to None to start with a blank schema
 
+        ### Feeder
+        # The feeder is the block which enables to select a song as input
+        # It enables to select a song from the ones we already processed 
+        # It gives 5 outputs of type Track, corresponding to the separated
+        # or entire versions of the selected song
 
         feed = Block(name="Track")
 
@@ -214,6 +213,7 @@ if tabs =='App':
         feed.add_output(name='Drums')
         feed.add_output(name='Other')
         
+        # Check if its first track (must change into merger for input 1)
         first_time=True
         other_tracks = []        
 
@@ -226,7 +226,6 @@ if tabs =='App':
             else:
                 if track_name not in other_tracks:
                     other_tracks.append(track_name)
-            # print(track_name) # Ca garde le nom quand on exec
             # spinner to view loading
             with st.spinner('Loading ' + self._name):
                 # a feeder will display all the different tracks of a song 
@@ -309,9 +308,11 @@ if tabs =='App':
                     if self._options['Metronome']['value']:
                         track.add_metronome()
 
+                    # Mashup title
                     st.markdown("### "+self._name + " : " + track.name)
                     mashup, sr = track.audio, track.sr
                     st.audio(mashup, sample_rate=sr)
+                    # This allows us to create an audio file to download it
                     audio_bytes = io.BytesIO()
                     sf.write(audio_bytes, mashup, sr, format='WAV')
                     audio_bytes.seek(0)
@@ -320,7 +321,7 @@ if tabs =='App':
 
         player.add_compute(player_func)
 
-        # Delete function from barfi manage_schema.py allows deletion of current schema
+        # Delete function from barfi manage_schema.py allows deletion of current saved schema
         def delete_schema(schema_name: str):
             try:
                 with open('schemas.barfi', 'rb') as handle_read:
@@ -336,7 +337,7 @@ if tabs =='App':
             
             with open('schemas.barfi', 'wb') as handle_write:
                 pickle.dump(schemas, handle_write, protocol=pickle.HIGHEST_PROTOCOL)
-
+        # Make sure we only show the 'delete button' when we load a saved schema
         if load_schema and load_schema != 'Start New':
             if st.button(f"Delete schema '{load_schema}'"):
                 try:
@@ -349,9 +350,10 @@ if tabs =='App':
         # Trigger Barfi, add all the blocks
         barfi_result = st_barfi(base_blocks=[feed, merger, player], compute_engine=True, load_schema=load_schema)
 
-        if barfi_result :
-            st.write("# Segments alignment")
 
+        # When we create a mashup with phase fit as a mashup technique, display the segment placement summary
+        if barfi_result and "mashup_technic_fit_phase" in str(technique):
+            st.write("# Segments alignment")
 
             # Retrieve the main segments
             main_segments = Track.get_segments(main_track)
@@ -384,8 +386,6 @@ if tabs =='App':
                             tile.title("")
                         main_segments.pop(0)
                         break
-
-
 
 if tabs == 'The project':
     # Application title
