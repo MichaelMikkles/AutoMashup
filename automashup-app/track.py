@@ -167,7 +167,7 @@ class Track:
                     if len(target_segment.beats) > 0:
                         target_bpm = len(target_segment.beats)/target_segment.duration
 
-                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio), self.sr)
+                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio))
                         audio = np.concatenate([audio, segment_fitted.audio])
 
                         # reset first beat position per segment
