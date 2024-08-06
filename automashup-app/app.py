@@ -104,12 +104,12 @@ if tabs =='App':
     if os.path.exists('./separated/htdemucs/'):
         st.title('Tracks')
 
-        col1, col2, col3, col4, col5, col6, col7, col8 = st.columns(8)
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
         col1.markdown("## Song Name")
         col2.markdown("## BPM")
         col3.markdown("## Key")
-        col6.markdown("## Segments")
-        col7.markdown("## Instruments")
+        col5.markdown("## Segments")
+        col6.markdown("## Instruments")
 
         st.divider()
 
@@ -119,7 +119,7 @@ if tabs =='App':
             # we get the file resulting of allin1 analysis
             struct_path = os.path.join('./struct/' + folder_name + '.json')
             if os.path.exists(struct_path):
-                col1, col2, col3, col4, col5, col6, col7, col8 = st.columns(8)
+                col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
                 col1.write(folder_name)
 
                 # then we display some data
@@ -127,11 +127,9 @@ if tabs =='App':
                     analysis = json.load(f)
                     col2.markdown(analysis['bpm'] if 'bpm' in analysis else "")
                     col3.markdown(key_from_dict(analysis["key"]) if "key" in analysis else "")
-                    download_button_id = f"download_button_{index}"
-                    col4.download_button('Analysis', f, key = download_button_id)
 
                 remove_button_id = f"remove_button_{index}"
-                if col5.button("Remove Track", key = remove_button_id):
+                if col4.button("Remove Track", key = remove_button_id):
                     st.warning("Are you sure you want to remove this track?", icon="⚠️")
                     if st.button("Confirm Remove Track"):
                         remove_track(folder_name)
@@ -144,11 +142,11 @@ if tabs =='App':
                 segment_labels = get_unique_ordered_list(segments)  # Remove duplicates (future work)
                 instruments_options = ["entire", "vocals", "bass", "drums", "other"]
 
-                selected_segment = col6.selectbox('Select Segment', segment_labels, key=f'segment_{index}')
-                selected_instrument = col7.selectbox('Select Instrument', instruments_options, key=f'instrument_{index}') 
+                selected_segment = col5.selectbox('Select Segment', segment_labels, key=f'segment_{index}')
+                selected_instrument = col6.selectbox('Select Instrument', instruments_options, key=f'instrument_{index}') 
 
                 play_button_id = f"play_button_{index}"
-                if col8.button("Play", key=play_button_id):
+                if col7.button("Play", key=play_button_id):
                     audio_file_path = get_path(folder_name, selected_instrument)
                     if os.path.exists(audio_file_path):
                         segments_full = Track.get_segments_full(folder_name)
@@ -162,6 +160,7 @@ if tabs =='App':
                         st.error(f"Audio file for {selected_instrument} not found.")
 
     st.divider()
+
 
 
     track_list = []
