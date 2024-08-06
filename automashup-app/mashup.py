@@ -81,8 +81,10 @@ def mashup_technic_fit_phase(tracks):
 
 def mashup_technic_fit_phase_repitch(tracks):
     # Mashup technique with phase alignment and repitch
+    # Repitch has to be the last method for it to be effective
     key = tracks[0].get_key() # target key
     for i in range(len(tracks)-1):
+        tracks[i + 1].fit_phase(tracks[0]) # phase fit
         tracks[i+1].pitch_track(key) # repitch
     # Phase fit mashup
-    return mashup_technic_fit_phase(tracks )
+    return mashup_technic(tracks, phase_fit=True)
