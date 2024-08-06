@@ -96,7 +96,7 @@ class Track:
 
 
     def fit_phase(self, target_track):
-        # Function to align a track's phases (verse, chorus, bridge, ...)
+        # Function to align track phases (verse, chorus, bridge, ...)
         # to a target track.
         # we'll do loops on the track to reach the number of beats targetted
         # for each phase
@@ -112,9 +112,10 @@ class Track:
 
         print(f" ********************** Adjusting the song {self.name}  **********************")
 
-        # loop over each phase to reproduce
+        # List of already found segments
         found_segments = {}
 
+        # loop over each phase to reproduce
         for target_segment in target_track.segments:
             i = 0
             found_segment = False
@@ -128,7 +129,7 @@ class Track:
 
             i = start_index
 
-            # We want to align the segments in order of appearance
+            # loop over each segment to find occurrences
             while i < len(self.segments):
                 segment = self.segments[i]
                 if segment.label == current_label:
@@ -150,7 +151,6 @@ class Track:
             # if we do not find it, we add zeros with the right length
             if (not found_segment):
                 tempo = round(len(target_segment.beats)/target_segment.duration)
-                print(f"Couldn't find segment: {target_segment.label} at {target_segment.start}")
                 try:
                     if tempo == 0:
                         segment_length = 0
@@ -162,29 +162,27 @@ class Track:
                 except Exception as e:
                     print(f"Error fitting silence. Error: {e}")
             else:
-                print(f"Matching segment found: {segment.label} at {segment.start} with segment {target_segment.label} at {target_segment.start}")
                 try:
                     # if we find it, we make it fit to the desired beat number
                     if len(target_segment.beats) > 0:
                         target_bpm = len(target_segment.beats)/target_segment.duration
-                        print("##target segment information.##")
-                        print("amount of beats: ", len(target_segment.beats), "duration in seconds: ", target_segment.duration*60)
 
-                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio))
+                        segment_fitted = segment.get_audio_beat_fitted(len(target_segment.beats), target_bpm, len(target_segment.audio), self.sr)
                         audio = np.concatenate([audio, segment_fitted.audio])
 
                         # reset first beat position per segment
                         track_sr = target_track.sr
                         track_beginning_temporal = target_segment.beats[0]
                         track_beginning = track_beginning_temporal * track_sr
-                        print("------------Track beginning : ", track_beginning_temporal)
                         # reset first beat position
                         audio = np.array(audio)[round(track_beginning):] 
 
                         # we add the new beats to be able to sync after
                         beats += [beats[-1] + phase_beat for phase_beat in segment_fitted.beats]
                         downbeats += [downbeats[-1] + phase_downbeat for phase_downbeat in segment_fitted.downbeats]
+                    # If its empty we ignore it
                     else: pass
+
                 except Exception as e:
                     print(f"Error fitting segment: {segment.label} at {segment.start}, Error: {e}")
                     continue
