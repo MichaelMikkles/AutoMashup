@@ -10,9 +10,13 @@ Trigger preprocessing to add your song to the list of songs.
 Once it's done, your song will be added to the list, along with information about its BPM and key. You can also download its analysis and remove any track you want.  
 ![Song List](./images/3.png)
 
-Now, you can start creating your mashup. Just below the song list is an area where you can add the blocks that will form your mashup. Right-click on the area to create blocks.
+Here you can listen to every segment of the song, and even choose the instrument you want to hear all alone.
 
 ![Creating Mashup](./images/4.png)
+
+Now, you can start creating your mashup. Just below the song list is an area where you can add the blocks that will form your mashup. Right-click on the area to create blocks.
+
+![Barfi preview](./images/BarfiPreview.gif)
 
 ### Track Workflow
 
