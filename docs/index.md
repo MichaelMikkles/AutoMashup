@@ -19,14 +19,14 @@ We're making a survey to improve our methods, please help us by **[taking part!]
 
 ## Examples of mashups
 
-*Secret Story of the Swan & Where We Started*
+*Shameless & Shivers*
 
 <audio controls>
     <source src="examples/Shameless%20&%20Shivers.wav" type="audio/wav">
 Your browser does not support the audio element.
 </audio> 
 
-*Shameless & Shivers*
+*Secret Story of the Swan & Where We Started*
 
 <audio controls>
   <source src="examples/SecretStoryoftheSwan%20&%20WhereWeStarted.wav" type="audio/wav">
