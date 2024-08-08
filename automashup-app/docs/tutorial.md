@@ -20,7 +20,7 @@ Now, you can start creating your mashup. Just below the song list is an area whe
 
 ### Track Workflow
 
-First, add your 'Track' blocks and choose the songs you want to mix using the elevator.  
+First, add your 'Track' blocks and choose the songs you want to mix using the scroll.  
 
 ![Track Blocks](./images/6.png)
 
@@ -38,10 +38,11 @@ Finally, link your 'Mixer' block to a 'Player' block and choose whether or not t
 
 #### Execution
 
-Once it’s done, you can execute it.  
+Once it’s done, you can save and execute it.  
+It may take a few seconds depending on the mashup technique you choose, and then the player will appear.  
+
 ![Execution](./images/10.png)  
 
-It will take a few seconds, and then the player will appear.  
 Congratulations, you can now listen to your own mashup!  
 
 ![Mashup Player](./images/11.png)
@@ -49,3 +50,13 @@ Congratulations, you can now listen to your own mashup!
 You can also download it if you like the result.
 
 ![Download Button](./images/12.png)
+
+## Saving and loading
+
+You can always save your process and load it back whenever you need it.
+
+### Save
+![Save schema](./images/SaveExample.gif)
+
+### Load
+![Load schema](./images/loadExample.gif)
