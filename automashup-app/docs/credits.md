@@ -4,56 +4,44 @@
 
 ### Core Team
 
-- **Project Lead**: [Name]
 - **Developers**:
-  - Duong Hoang - [Role/Contribution]
-  - Ella Fernandez - [Role/Contribution]
-  - Flavie Manet - [Role/Contribution]
-  - Gautier Bogois - [Role/Contribution]
-  - Maria Alejandra Salgado - [Role/Contribution]
-  - Michael Moreno - [Role/Contribution]
-- **Designers**:
-  - [Name] - [Role/Contribution]
-  - [Name] - [Role/Contribution]
-- **Content Creators**:
-  - [Name] - [Role/Contribution]
-  - [Name] - [Role/Contribution]
+  - Duong Hoang 
+  - Ella Fernandez
+  - Flavie Manet 
+  - Gautier Bogois 
+  - Maria Alejandra Salgado 
+  - Michael Moreno 
 
 ### Special Thanks
+  - Pablo Troncoso - Music enthusiast
 
 - **Advisors**:
-  - Nicolas Farrugia - [Expertise or advice provided]
-  - Axel Marmoret - [Expertise or advice provided]
-- **Beta Testers**:
-  - [Name] - [Feedback or testing contributions]
-  - [Name] - [Feedback or testing contributions]
-- **Mentors**:
-  - [Name] - [Guidance or mentorship provided]
+  - Nicolas Farrugia 
+  - Axel Marmoret 
 
 ## Acknowledgements
 
 - **Tools and Technologies**:
-  - [Tool/Technology Name] - [Brief description or how it was used]
-  - [Tool/Technology Name] - [Brief description or how it was used]
+  - Streamlit - App framework 
+  - AllInOne - Music structure analysis
+  - Barfi - Flow Based Programming environment
 - **Open-Source Libraries**:
-  - [Library Name] - [Brief description or how it was used]
-  - [Library Name] - [Brief description or how it was used]
-- **Design Assets**:
-  - [Asset Name or Source] - [Brief description or link to the source]
+  - Librosa - Music and audio analysis
 
 ## Additional Credits
 
 - **Music and Sound**:
-  - [Artist/Composer Name] - [Track or sound used in the project]
-  - [Artist/Composer Name] - [Track or sound used in the project]
-- **Images and Graphics**:
-  - [Artist/Photographer Name] - [Graphic or image used in the project]
-  - [Artist/Photographer Name] - [Graphic or image used in the project]
+  - Camila Cabello - Shameless
+  - Ed Sheeran - Shivers
+  - Iz*one - Secret Story of the Swan
+  - Lost sky -  Where we started
 
-## License and Attribution
 
-- **Project License**:
-  - This project is licensed under the [License Name] - [Link to license].
+## Contribute!
+If you want to contribute to our project, have a look at our GitHub!  
+[https://github.com/MichaelMikkles/AutoMashup](https://github.com/MichaelMikkles/AutoMashup)
 
-- **Third-Party Content**:
-  - [Content Name] - Used under [License Name], [Link to license or source].
+![IMT Atlantique Logo](./images/IMT_Atlantique_logo.png#only-dark)
+![IMT Atlantique Logo](./images/IMT_Atlantique_logo_Black.png#only-light)
+
+

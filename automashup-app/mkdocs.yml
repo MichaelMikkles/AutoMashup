@@ -49,3 +49,9 @@ markdown_extensions:
   - pymdownx.mark
   - attr_list
   - md_in_html
+
+nav:
+  - Home: index.md
+  - Tutorial: tutorial.md
+  - Future work: FutureWork.md
+  - Credits: credits.md
