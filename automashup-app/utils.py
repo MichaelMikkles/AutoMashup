@@ -6,7 +6,6 @@ import json
 from pymusickit.key_finder import KeyFinder
 from collections import OrderedDict
 from pydub import AudioSegment
-from pydub.playback import play
 
 ### Here are some useful functions used in other parts of the project
 
