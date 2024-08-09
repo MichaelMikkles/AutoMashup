@@ -6,6 +6,7 @@
 - **Avoid app reset on segment selection**: Prevent the app from resetting when selecting a segment on the segment preview. Although you can still interact with the app while it reloads, it is quite annoying.
 - **Correct the segment summary's main track**: The main track in the segment summary is currently set to the Feed whose name is 'Track-1' instead of 'Input 1 (Beat structure)', as it should be. The challenge is to get the chosen input and set it as a global variable so it can be retrieved in the segment summary.
 - **Quality of Life (QoL) improvement**: When saving a schema, sometimes the saving menu relaunches even though it does save the schema. It would be beneficial to check if it’s possible avoid this relaunch after saving.
+- **Fix the delete button for track**: On the last tests, saw that delete track is not working properly.
 
 ## Propositions
 
