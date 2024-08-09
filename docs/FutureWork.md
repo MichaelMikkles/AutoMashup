@@ -13,3 +13,7 @@
 - **Make the segment summary interactive**: After the mashup with phase fit is created, make the segment summary interactive, allowing users to switch, remove, or add segments in a Lego-like interface.
 - **Make the app suitable for mobile devices**: Enhance the app's usability on mobile devices.
 - **Add a dark mode toggle**: Provide a dark mode option for better accessibility and user experience.
+
+## Want to know the last advancements?
+
+Download [this file](./documents/Changes%20since%20first%20version.docx){:download="awesome-file"} to check advancements from 17/06/24 until 09/08/24

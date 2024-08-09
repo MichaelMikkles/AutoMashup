@@ -399,8 +399,8 @@ if tabs == 'The project':
     st.markdown("## [Survey](http://automashup.ddns.net:8080/)")
     st.markdown("We're making a survey to improve our methods, please help us by **[taking part !](http://automashup.ddns.net:8080/)**")
     st.markdown("## Examples of mashups realized with the app")
-    st.audio("./examples/shape of you - love me harder.wav")
-    st.audio("./examples/je t'aime de ouf - love me harder.wav")
+    st.audio("./examples/SecretStoryoftheSwan & WhereWeStarted.wav")
+    st.audio("./examples/Shameless & Shivers.wav")
     
     st.markdown("## Tutorial")
     st.markdown("To follow this tutorial, you'll have to go to the app section of this website.")
@@ -437,11 +437,27 @@ if tabs == 'The project':
     
     # Execution and result section
     st.markdown("#### Execution")
-    st.markdown("Once it’s done, you can execute it.")
-    st.image("./images/10.png")
-    st.markdown("It will take a few seconds, and then the player will appear.")
+
+    st.markdown("Once it’s done, you can save and execute it.")
+    st.markdown("It may take a few seconds depending on the mashup technique you choose, and then the player will appear.")
+    st.image("./images/10.png", caption="Execution")
+
     st.markdown("Congratulations, you can now listen to your own mashup!")
-    st.image("./images/11.png")
+    st.image("./images/11.png", caption="Mashup Player")
+
+    st.markdown("You can also download it if you like the result.")
+    st.image("./images/12.png", caption="Download Button")
+
+    st.markdown("## Saving and loading")
+
+    st.markdown("You can always save your process and load it back whenever you need it.")
+
+    st.markdown("### Save")
+    st.image("./images/SaveExample.gif", caption="Save schema")
+
+    st.markdown("### Load")
+    st.image("./images/loadExample.gif", caption="Load schema")
+
 
 
 if tabs == 'Contribute':
